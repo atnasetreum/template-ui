@@ -18,8 +18,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"],
+      "@shared/*": ["./src/app/_shared/*"],
+      "@services": ["./src/app/_services"],
+      "@constants": ["./src/app/_constants"]
+    },
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
