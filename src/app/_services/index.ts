@@ -1,2 +1,3 @@
-export * from "./auth.api";
-export * from "./users.api";
+export * from "./axiosWrapper";
+export * from "./auth.service";
+export * from "./users.service";

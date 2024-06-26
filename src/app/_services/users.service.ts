@@ -1,4 +1,4 @@
-import axiosWrapper from "./axiosWrapper";
+import { axiosWrapper } from "./axiosWrapper";
 
 const api = axiosWrapper({
   baseURL: "/users",
@@ -9,6 +9,6 @@ const findAll = async () => {
   return data;
 };
 
-export const UsersApi = {
+export const UsersService = {
   findAll,
 };

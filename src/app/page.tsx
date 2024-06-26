@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { AuthApi } from "@services";
+import { AuthService } from "@services";
 import { encrypt } from "@shared/utils";
 import { ROUTE_DASHBOARD } from "@constants";
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const validateCredentials = () => {
-    AuthApi.login({
+    AuthService.login({
       email: encrypt(form.email),
       password: encrypt(form.password),
     }).then(() => router.push(ROUTE_DASHBOARD));

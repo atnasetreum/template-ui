@@ -1,4 +1,4 @@
-import axiosWrapper from "./axiosWrapper";
+import { axiosWrapper } from "./axiosWrapper";
 
 interface PayloadLogin {
   email: string;
@@ -19,7 +19,7 @@ const logout = async () => {
   return data;
 };
 
-export const AuthApi = {
+export const AuthService = {
   login,
   logout,
 };

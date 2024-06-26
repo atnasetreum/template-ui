@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { ROUTE_ROOT } from "@constants";
+import { AuthService } from "@services";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -120,7 +121,13 @@ export default function DashboardPage() {
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push(ROUTE_ROOT)}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    AuthService.logout().then(() => {
+                      router.push(ROUTE_ROOT);
+                    });
+                  }}
+                >
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -32,9 +32,7 @@ export const handleErrorResponse = (error: AxiosError<IErrorResponse>) => {
   return Promise.reject(error);
 };
 
-export default function axiosWrapper({
-  baseURL,
-}: IAxiosWrapperProps): AxiosInstance {
+export function axiosWrapper({ baseURL }: IAxiosWrapperProps): AxiosInstance {
   const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL + baseURL,
   });
