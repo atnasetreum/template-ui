@@ -22,7 +22,10 @@
       "@shared/*": ["./src/app/_shared/*"],
       "@services": ["./src/app/_services"],
       "@constants": ["./src/app/_constants"],
-      "@interfaces": ["./src/app/_interfaces"]
+      "@interfaces": ["./src/app/_interfaces"],
+      "@hooks": ["./src/app/_hooks"],
+      "@contexts": ["./src/app/_contexts"],
+      "@store": ["./src/app/_store"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true

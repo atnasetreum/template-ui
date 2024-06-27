@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import { Toaster } from "sonner";
 
 import { cn } from "@/lib/utils";
+import { SocketProvider } from "@contexts";
 
 import "./globals.css";
 
@@ -31,7 +32,7 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        {children}
+        <SocketProvider>{children}</SocketProvider>
         <Toaster position="top-right" expand={true} richColors closeButton />
       </body>
     </html>
