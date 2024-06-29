@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
+import Script from "next/script";
 
 import { Toaster } from "sonner";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
       >
         <SocketProvider>{children}</SocketProvider>
         <Toaster position="top-right" expand={true} richColors closeButton />
+        <Script src="/service-worker.js" />
       </body>
     </html>
   );

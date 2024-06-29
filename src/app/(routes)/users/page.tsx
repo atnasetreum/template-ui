@@ -1,5 +1,7 @@
 "use client";
 
+import { useShallow } from "zustand/react/shallow";
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -27,7 +29,7 @@ import MainLayout from "../layout";
 import { useUsersStore } from "@store";
 
 function UsersPage() {
-  const users = useUsersStore((state) => state.users);
+  const users = useUsersStore(useShallow((state) => state.users));
 
   return (
     <Card className="flex flex-col gap-4">

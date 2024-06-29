@@ -25,7 +25,8 @@
       "@interfaces": ["./src/app/_interfaces"],
       "@hooks": ["./src/app/_hooks"],
       "@contexts": ["./src/app/_contexts"],
-      "@store": ["./src/app/_store"]
+      "@store": ["./src/app/_store"],
+      "@components/*": ["./src/app/_components/*"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true
