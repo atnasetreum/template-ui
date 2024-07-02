@@ -27,6 +27,7 @@ import {
 
 import MainLayout from "../layout";
 import { useUsersStore } from "@store";
+import { dataTimeFormat } from "@shared/utils";
 
 function UsersPage() {
   const users = useUsersStore(useShallow((state) => state.users));
@@ -41,14 +42,15 @@ function UsersPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">ID</TableHead>
+              <TableHead className="w-[350px]">ID</TableHead>
               <TableHead className="min-w-[150px]">Nombre</TableHead>
               <TableHead className="hidden md:table-cell">
                 Correo electrónico
               </TableHead>
-              <TableHead className="hidden md:table-cell">Date</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="hidden sm:table-cell">Status</TableHead>
+              <TableHead className="hidden md:table-cell">
+                Fecha de creación
+              </TableHead>
+              <TableHead className="text-right">Última actualización</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -61,10 +63,11 @@ function UsersPage() {
                   {user.email}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  February 20, 2022
+                  {dataTimeFormat(user.createdAt)}
                 </TableCell>
-                <TableCell className="text-right">$42.25</TableCell>
-                <TableCell className="hidden sm:table-cell">Shipped</TableCell>
+                <TableCell className="text-right">
+                  {dataTimeFormat(user.updatedAt)}
+                </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

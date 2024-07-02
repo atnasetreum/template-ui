@@ -22,7 +22,7 @@ import { ROUTE_DASHBOARD } from "@constants";
 
 export default function LoginPage() {
   const [form, setForm] = useState({
-    email: "eduardo-266x22@hotmail.com",
+    email: "eduardo-266@hotmail.com",
     password: "tem2042acm1ptAA$$",
   });
 

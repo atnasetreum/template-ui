@@ -40,3 +40,25 @@ export const isValidEmail = (email: string) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 };
+
+export const dataTimeFormat = (date: Date) => {
+  return new Date(date).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+};
+
+export const showNotification = (
+  title: string,
+  options?: NotificationOptions | undefined
+) => {
+  if (Notification.permission === "granted") {
+    new Notification(title, {
+      icon: "/assets/images/notifications/icon.png",
+      ...options,
+    });
+  }
+};

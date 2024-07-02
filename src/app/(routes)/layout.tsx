@@ -1,10 +1,11 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,16 +21,21 @@ import { Button } from "@/components/ui/button";
 
 import { ROUTE_DASHBOARD, ROUTE_ROOT, ROUTE_USERS } from "@constants";
 import { SocketContext } from "@contexts";
-import { AuthService } from "@services";
+import { AuthService, NotificationsService } from "@services";
 import { useCurrentUserStore, useUsersStore } from "@store";
 import { User } from "@interfaces";
+import DialogConfirmNotification from "@components/main";
+import { showNotification } from "@shared/utils";
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const router = useRouter();
+  const pathname = usePathname();
 
   const setUsers = useUsersStore((state) => state.setUsers);
   const setCurrentUser = useCurrentUserStore((state) => state.setCurrentUser);
@@ -68,131 +74,190 @@ export default function MainLayout({
     };
   }, [socket, setCurrentUser, setUsers]);
 
+  const notifyPermission = () => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "granted") return;
+
+      setIsOpen(true);
+    } else {
+      console.log("Notification API not supported.");
+    }
+  };
+
+  useEffect(() => {
+    notifyPermission();
+  }, []);
+
   return (
-    <div className="grid min-h-screen w-full overflow-hidden lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-muted/40 lg:block">
-        <div className="flex flex-col gap-2">
-          <div className="flex h-[60px] items-center px-6">
-            <Link
-              href="#"
-              className="flex items-center gap-2 font-semibold"
-              prefetch={false}
-            >
-              <Package2Icon className="h-6 w-6" />
-              <span className="">Acme</span>
-              {isSocketConnected ? (
-                <Badge variant="default">Online</Badge>
-              ) : (
-                <Badge variant="destructive">Offline</Badge>
-              )}
-            </Link>
-          </div>
-          <div className="flex-1">
-            <nav className="grid items-start px-4 text-sm font-medium">
-              <Link
-                href={ROUTE_DASHBOARD}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-primary bg-primary-foreground"
-                prefetch={false}
-              >
-                <HomeIcon className="h-4 w-4" />
-                Dashboard
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                prefetch={false}
-              >
-                <ShoppingCartIcon className="h-4 w-4" />
-                Orders
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                prefetch={false}
-              >
-                <PackageIcon className="h-4 w-4" />
-                Products
-              </Link>
-              <Link
-                href={ROUTE_USERS}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                prefetch={false}
-              >
-                <UsersIcon className="h-4 w-4" />
-                Users
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                prefetch={false}
-              >
-                <LineChartIcon className="h-4 w-4" />
-                Analytics
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col">
-        <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-muted/40 px-6">
-          <Link href="#" className="lg:hidden" prefetch={false}>
-            <Package2Icon className="h-6 w-6" />
-            <span className="sr-only">Home</span>
-          </Link>
-          <div className="flex-1">
-            <h1 className="font-semibold text-lg">
-              Dashboard: {currentUser?.name}
-            </h1>
-          </div>
-          <div className="flex flex-1 items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-            <form className="ml-auto flex-1 sm:flex-initial">
-              <div className="relative">
-                <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-                />
-              </div>
-            </form>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Image
-                    src="/assets/images/profile.png"
-                    width="32"
-                    height="32"
-                    className="rounded-full"
-                    alt="Avatar"
-                  />
-                  <span className="sr-only">Toggle user menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    AuthService.logout().then(() => {
-                      disconnectSocket();
-                      router.push(ROUTE_ROOT);
+    <>
+      <DialogConfirmNotification
+        isOpen={isOpen}
+        close={(confirm) => {
+          if (confirm) {
+            Notification.requestPermission().then((permission) => {
+              if (permission === "granted") {
+                console.log("Notification permission granted.");
+                navigator.serviceWorker.ready.then(function (registration) {
+                  NotificationsService.saveSubscribe(registration).then(() => {
+                    showNotification("Notification!", {
+                      body: "This is a test notification!",
                     });
+                  });
+                });
+              }
+            });
+          }
+          setIsOpen(false);
+        }}
+      />
+      <div className="grid min-h-screen w-full overflow-hidden lg:grid-cols-[280px_1fr]">
+        <div className="hidden border-r bg-muted/40 lg:block">
+          <div className="flex flex-col gap-2">
+            <div className="flex h-[60px] items-center px-6">
+              <Link
+                href="#"
+                className="flex items-center gap-2 font-semibold"
+                prefetch={false}
+              >
+                <Package2Icon className="h-6 w-6" />
+                <span className="">Acme</span>
+              </Link>
+              <div className="ml-2">
+                {isSocketConnected ? (
+                  <Badge variant="default">Online</Badge>
+                ) : (
+                  <Badge variant="destructive">Offline</Badge>
+                )}
+              </div>
+              <div className="ml-2">
+                <Badge
+                  style={{ cursor: "pointer" }}
+                  variant="outline"
+                  onClick={() => {
+                    NotificationsService.push();
                   }}
                 >
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  notification
+                </Badge>
+              </div>
+            </div>
+            <div className="flex-1">
+              <nav className="grid items-start px-4 text-sm font-medium">
+                <Link
+                  href={ROUTE_DASHBOARD}
+                  className={
+                    "flex items-center gap-3 rounded-lg px-3 py-2  bg-primary-foreground " +
+                    (pathname === ROUTE_DASHBOARD
+                      ? "text-primary"
+                      : "text-muted-foreground")
+                  }
+                  prefetch={false}
+                >
+                  <HomeIcon className="h-4 w-4" />
+                  Dashboard
+                </Link>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  prefetch={false}
+                >
+                  <ShoppingCartIcon className="h-4 w-4" />
+                  Orders
+                </Link>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  prefetch={false}
+                >
+                  <PackageIcon className="h-4 w-4" />
+                  Products
+                </Link>
+                <Link
+                  href={ROUTE_USERS}
+                  className={
+                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary " +
+                    (pathname === ROUTE_USERS
+                      ? "text-primary"
+                      : "text-muted-foreground")
+                  }
+                  prefetch={false}
+                >
+                  <UsersIcon className="h-4 w-4" />
+                  Users
+                </Link>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  prefetch={false}
+                >
+                  <LineChartIcon className="h-4 w-4" />
+                  Analytics
+                </Link>
+              </nav>
+            </div>
           </div>
-        </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
-          {children}
-        </main>
+        </div>
+        <div className="flex flex-col">
+          <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-muted/40 px-6">
+            <Link href="#" className="lg:hidden" prefetch={false}>
+              <Package2Icon className="h-6 w-6" />
+              <span className="sr-only">Home</span>
+            </Link>
+            <div className="flex-1">
+              <h1 className="font-semibold text-lg">
+                Dashboard: {currentUser?.name}
+              </h1>
+            </div>
+            <div className="flex flex-1 items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+              <form className="ml-auto flex-1 sm:flex-initial">
+                <div className="relative">
+                  <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+                  />
+                </div>
+              </form>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Image
+                      src="/assets/images/profile.png"
+                      width="32"
+                      height="32"
+                      className="rounded-full"
+                      alt="Avatar"
+                    />
+                    <span className="sr-only">Toggle user menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      AuthService.logout().then(() => {
+                        disconnectSocket();
+                        router.push(ROUTE_ROOT);
+                      });
+                    }}
+                  >
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </header>
+          <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

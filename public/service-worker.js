@@ -8,42 +8,10 @@ function registerServiceWorker() {
 
         const permisson = Notification.permission;
 
-        /*if (pathname !== "/auth/login" && permisson === "default") {
-          Notification.requestPermission(function (status) {
-            console.log("Notification permission status:", status);
-
-            if (status === "granted") {
-              fetch("/api/vapid-keys", {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              })
-                .then(function (response) {
-                  return response.text();
-                })
-                .then(function (text) {
-                  const { publicKey } = JSON.parse(text);
-
-                  registration.pushManager
-                    .subscribe({
-                      userVisibleOnly: true,
-                      applicationServerKey: publicKey,
-                    })
-                    .then(function (subscription) {
-                      console.log("User is subscribed:", subscription);
-                      fetch("/api/vapid-keys", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(subscription),
-                      });
-                    });
-                });
-            }
-          });
-        }*/
+        console.log({
+          pathname,
+          permisson,
+        });
       });
     } else {
       console.error("Service Worker registration failed.");

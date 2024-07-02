@@ -35,11 +35,19 @@ self.addEventListener("fetch", (event) => {
   );*/
 });
 
-/*
 self.addEventListener("push", (event) => {
   console.log("Push notification received");
 
-  const icon =
+  event.waitUntil(
+    self.registration.showNotification("Notification!", {
+      icon: "/assets/images/notifications/icon.png",
+      body: "This is a test notification!",
+    })
+  );
+
+  //showNotification(event);
+
+  /*const icon =
     "https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/notification-circle-blue-512.png";
 
   const iconCall = "/imgs/icon-call.png";
@@ -97,8 +105,10 @@ self.addEventListener("push", (event) => {
         self.registration.showNotification(`${type} - ${name}`, options)
       );
     }
-  }
+  }*/
 });
+
+/*
 
 self.addEventListener("notificationclick", (event) => {
   console.log("Notification clicked");

@@ -63,6 +63,7 @@ function DashboardPage() {
                 className="ml-2"
                 variant="outline"
                 onClick={updateChartBySocket}
+                style={{ cursor: "pointer" }}
               >
                 Update
               </Badge>
