@@ -18,7 +18,6 @@ import { encrypt, isValidEmail, notify } from "@shared/utils";
 
 export const FormLogin = () => {
   const router = useRouter();
-
   const [form, setForm] = useState<{
     email: string;
     password: string;
@@ -26,23 +25,18 @@ export const FormLogin = () => {
     email: "eduardo-266@hotmail.com",
     password: "tem2042acm1ptAA$$",
   });
-
   const validateCredentials = () => {
     const emailClean = form.email.trim();
     const passwordClean = form.password.trim();
-
     if (!emailClean) {
       return notify("Email is required");
     }
-
     if (!passwordClean) {
       return notify("Password is required");
     }
-
     if (!isValidEmail(emailClean)) {
       return notify("Email is invalid");
     }
-
     AuthService.login({
       email: encrypt(form.email),
       password: encrypt(form.password),

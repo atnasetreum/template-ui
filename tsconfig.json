@@ -22,7 +22,12 @@
       "@components": ["./_components"],
       "@services": ["./_services"],
       "@shared/*": ["./_shared/*"],
-      "@constants": ["./_constants"]
+      "@constants": ["./_constants"],
+      "@interfaces": ["./_interfaces"],
+      "@hooks": ["./_hooks"],
+      "@contexts": ["./_contexts"],
+      "@store": ["./_store"],
+      "@config": ["./_config"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true

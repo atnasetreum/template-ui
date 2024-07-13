@@ -1,80 +1,91 @@
-import * as React from 'react';
-import { useTheme } from '@mui/material/styles';
-import { LineChart, axisClasses } from '@mui/x-charts';
-import { ChartsTextStyle } from '@mui/x-charts/ChartsText';
-import Title from './Title';
+"use client";
 
-// Generate Sales Data
-function createData(
-  time: string,
-  amount?: number,
-): { time: string; amount: number | null } {
-  return { time, amount: amount ?? null };
+import { useContext, useEffect, useState } from "react";
+
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+
+import { optionsChartDefault } from "@config";
+
+import { SocketContext } from "@contexts";
+
+if (typeof Highcharts === "object") {
+  require("highcharts/modules/exporting")(Highcharts);
+  require("highcharts/modules/drilldown")(Highcharts);
+  require("highcharts/modules/accessibility")(Highcharts);
 }
 
-const data = [
-  createData('00:00', 0),
-  createData('03:00', 300),
-  createData('06:00', 600),
-  createData('09:00', 800),
-  createData('12:00', 1500),
-  createData('15:00', 2000),
-  createData('18:00', 2400),
-  createData('21:00', 2400),
-  createData('24:00'),
-];
+export const Chart = () => {
+  const { socket } = useContext(SocketContext);
 
-export default function Chart() {
-  const theme = useTheme();
+  const [dataRealTime, setDataRealTime] = useState<(string | number)[][]>([]);
+
+  useEffect(() => {
+    const event = "total-revenue";
+    socket?.on(event, (data) => {
+      setDataRealTime(data);
+    });
+    return () => {
+      socket?.off(event);
+    };
+  }, [socket]);
 
   return (
-    <React.Fragment>
-      <Title>Today</Title>
-      <div style={{ width: '100%', flexGrow: 1, overflow: 'hidden' }}>
-        <LineChart
-          dataset={data}
-          margin={{
-            top: 16,
-            right: 20,
-            left: 70,
-            bottom: 30,
-          }}
-          xAxis={[
-            {
-              scaleType: 'point',
-              dataKey: 'time',
-              tickNumber: 2,
-              tickLabelStyle: theme.typography.body2 as ChartsTextStyle,
-            },
-          ]}
-          yAxis={[
-            {
-              label: 'Sales ($)',
-              labelStyle: {
-                ...(theme.typography.body1 as ChartsTextStyle),
-                fill: theme.palette.text.primary,
+    <HighchartsReact
+      highcharts={Highcharts}
+      containerProps={{ style: { height: "100%" } }}
+      options={{
+        ...optionsChartDefault,
+        title: {
+          text: "Growth of Internet Users Worldwide (logarithmic scale)",
+        },
+
+        accessibility: {
+          point: {
+            valueDescriptionFormat:
+              "{xDescription}{separator}{value} million(s)",
+          },
+        },
+
+        xAxis: {
+          title: {
+            text: "Year",
+          },
+          categories: [1995, 2000, 2005, 2010, 2015, 2020, 2023],
+        },
+
+        yAxis: {
+          type: "logarithmic",
+          title: {
+            text: "Number of Internet Users (in millions)",
+          },
+        },
+
+        tooltip: {
+          headerFormat: "<b>{series.name}</b><br />",
+          pointFormat: "{point.y} million(s)",
+        },
+
+        series: [
+          {
+            name: "Internet Users",
+            keys: ["y", "color"],
+            data: dataRealTime,
+            color: {
+              linearGradient: {
+                x1: 0,
+                x2: 0,
+                y1: 1,
+                y2: 0,
               },
-              tickLabelStyle: theme.typography.body2 as ChartsTextStyle,
-              max: 2500,
-              tickNumber: 3,
+              stops: [
+                [0, "#0000ff"],
+                [1, "#ff0000"],
+              ],
             },
-          ]}
-          series={[
-            {
-              dataKey: 'amount',
-              showMark: false,
-              color: theme.palette.primary.light,
-            },
-          ]}
-          sx={{
-            [`.${axisClasses.root} line`]: { stroke: theme.palette.text.secondary },
-            [`.${axisClasses.root} text`]: { fill: theme.palette.text.secondary },
-            [`& .${axisClasses.left} .${axisClasses.label}`]: {
-              transform: 'translateX(-25px)',
-            },
-          }}
-        />
-      </div>
-    </React.Fragment>
+          },
+        ],
+      }}
+    />
   );
-}
+};

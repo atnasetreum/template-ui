@@ -1,5 +1,8 @@
 import CryptoJS from "crypto-js";
 import { toast } from "sonner";
+import moment from "moment";
+
+import "moment/locale/es";
 
 const key = CryptoJS.enc.Utf8.parse(process.env.NEXT_PUBLIC_CRYPTOJS_KEY!);
 const iv = CryptoJS.enc.Utf8.parse(process.env.NEXT_PUBLIC_CRYPTOJS_IV!);
@@ -50,6 +53,8 @@ export const dataTimeFormat = (date: Date) => {
     minute: "numeric",
   });
 };
+
+export const nowDateWithTime = () => moment().format("DD/MM/YYYY h:mm a");
 
 export const showNotification = (
   title: string,

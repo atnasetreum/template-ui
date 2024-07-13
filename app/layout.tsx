@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
+import { Toaster } from "sonner";
 
 import theme from "./theme";
+import { SocketProvider } from "@contexts";
 
 import "./globals.css";
 
@@ -26,11 +29,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <AppRouterCacheProvider options={{ key: "css" }}>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <SocketProvider>
+            <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          </SocketProvider>
         </AppRouterCacheProvider>
+        <Toaster position="top-right" expand={true} richColors closeButton />
+        <Script src="/service-worker.js" />
       </body>
     </html>
   );
